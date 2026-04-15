@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Vector store in-memory, cosine brute-force, có nhận thức ACL metadata + spec.
 
 Khác SentinelLog (phân vùng theo tenant): ở đây ACL phức tạp hơn (dept × clearance)

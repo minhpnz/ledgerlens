@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Sinh câu trả lời RAG cấp compliance — grounded, có citation, an toàn.
 
 Bốn ràng buộc cứng (khác 'RAG demo'):

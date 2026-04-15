@@ -1,7 +1,8 @@
-"""Entrypoint: chạy LedgerLens API với dữ liệu seed.
+#Developed by HenryPhan
+"""Entrypoint: run the LedgerLens API with seeded data.
 
     ./.venv/bin/python -m uvicorn main:app --port 8090
-hoặc:
+or:
     ./.venv/bin/python main.py
 """
 from __future__ import annotations

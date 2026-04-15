@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Hybrid retriever: BM25 + vector -> RRF -> ACL PRE-FILTER -> rerank.
 
 Thứ tự CỐ Ý (mỗi bước một quyết định senior):

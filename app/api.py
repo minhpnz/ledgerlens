@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Lớp FastAPI MỎNG bọc LedgerLensService (mọi logic ở app/service.py).
 
 Vì sao FastAPI (không Flask/Django): async-native (hợp việc gọi LLM/embedding I/O-

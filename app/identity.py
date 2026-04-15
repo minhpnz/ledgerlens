@@ -1,8 +1,10 @@
-"""Phân giải token -> Identity (actor, dept, clearance).
+#Developed by HenryPhan
+"""Resolve a token into an Identity (actor, dept, clearance).
 
-Nguyên tắc như SentinelLog: dept/clearance của người hỏi LUÔN đến từ đây (sau xác
-thực), KHÔNG từ body request → chống privilege escalation. Bản demo in-memory;
-production nạp từ IdP/OIDC claims + directory, cache TTL.
+The rule: the caller's department and clearance ALWAYS come from here, after
+authentication, and never from the request body — otherwise any client could
+escalate its own privileges. This is an in-memory demo; production would load
+from IdP/OIDC claims and a directory, with a TTL cache.
 """
 from __future__ import annotations
 

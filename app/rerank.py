@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Reranker — bước tinh (precision) sau retrieve (recall).
 
 Kiến trúc chuẩn: retrieve NHIỀU (BM25+vector+RRF, recall cao) → rerank ÍT (top-k,

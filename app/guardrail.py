@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Guardrail — phòng thủ LLM: prompt injection + refusal + untrusted separation.
 
 Threat model (OWASP LLM Top 10):

@@ -1,37 +1,42 @@
+#Developed by HenryPhan
 # LedgerLens — Compliance-grade RAG over regulatory documents (Python/FastAPI)
 
-Product 2 của portfolio (xem `../portfolio-projects.md` §Product 2). RAG cấp compliance:
-hybrid search (BM25+vector) + rerank + **citation bắt buộc**, **ACL pre-filter** (dept ×
-clearance), **zero-downtime reindex**, **resumable ingest**, audit hash-chain, warehouse
-analytics, và **MCP-style tool** để agent kết nối.
+A compliance-grade retrieval system: hybrid search (BM25 + vector) with
+reranking and **mandatory citations**, an **ACL pre-filter** (department ×
+clearance), **zero-downtime reindexing**, **resumable ingest**, a hash-chained
+audit log, warehouse analytics, and an **MCP-style tool interface** for agents to
+connect through.
 
-**Định vị SRE/Platform:** không có ML depth — toàn bộ là systems/retrieval/ops engineering.
-Bài học & "why-this-not-that" ở `LESSONS.md` (đọc phần A: các trục SRE).
+The engineering focus is systems, retrieval and operations rather than ML depth.
+Design notes and the "why this, not that" reasoning behind each decision are in
+`LESSONS.md`.
 
-Lõi (`app/`) **framework-agnostic + test bằng pytest**; `app/api.py` là lớp FastAPI mỏng.
+The core (`app/`) is **framework-agnostic and tested with pytest**; `app/api.py`
+is a thin FastAPI layer on top.
 
-## Chạy
+## Running
 
 ```bash
 cd ledgerlens
 python3 -m venv .venv && ./.venv/bin/pip install "fastapi" "uvicorn" "pytest" "httpx"
-./.venv/bin/python -m pytest -q          # 25 test: ACL isolation, reindex, RAG, ingest resume...
-./.venv/bin/python main.py               # API tại http://127.0.0.1:8090
+./.venv/bin/python -m pytest -q          # 25 tests: ACL isolation, reindex, RAG, ingest resume, ...
+./.venv/bin/python main.py               # API at http://127.0.0.1:8090
 ```
 
-Token demo (token → dept, clearance): `fin-analyst` (finance, INTERNAL), `fin-admin`
-(finance, RESTRICTED), `legal-analyst`, `legal-admin`.
+Demo tokens (token → department, clearance): `fin-analyst` (finance, INTERNAL),
+`fin-admin` (finance, RESTRICTED), `legal-analyst`, `legal-admin`.
 
 ```bash
-# Query có citation, tôn trọng ACL của người gọi
+# Query with citations, honouring the caller's ACL
 curl -s localhost:8090/v1/query -H 'Authorization: Bearer fin-admin' \
   -d '{"question":"Project Titan acquisition premium timeline"}'
 
-# analyst hỏi cùng câu → out-of-scope hint (có tài liệu nhưng ngoài quyền, KHÔNG lộ nội dung)
+# The analyst asks the same question → out-of-scope hint: documents exist but are
+# outside their clearance, and NO content is revealed
 curl -s localhost:8090/v1/query -H 'Authorization: Bearer fin-analyst' \
   -d '{"question":"Project Titan acquisition premium timeline"}'
 
-# MCP tool (agent connect) — vẫn qua ACL + audit
+# MCP tool (agent connection) — still passes through ACL and audit
 curl -s localhost:8090/mcp/call -H 'Authorization: Bearer fin-admin' \
   -d '{"name":"search_policies","arguments":{"question":"data retention seven years"}}'
 
@@ -40,25 +45,27 @@ curl -s localhost:8090/v1/analytics    -H 'Authorization: Bearer fin-admin'
 curl -s localhost:8090/v1/audit/verify -H 'Authorization: Bearer fin-admin'
 ```
 
-## Bản đồ module (chi tiết + alternatives ở `LESSONS.md`)
+## Module map (details and alternatives in `LESSONS.md`)
 
-| File | Vai trò | Pattern |
+| File | Role | Pattern |
 |---|---|---|
-| `app/ingest.py` | Resumable pipeline (PARSE→CHUNK→EMBED) | checkpoint state-machine + idempotent + fault-inject test |
-| `app/reindex.py` + `service.py` | Zero-downtime reindex | **blue/green theo spec + switch atomic** |
-| `app/acl.py` + `retriever.py` | Kiểm soát truy cập | **ACL PRE-filter (dept × clearance)** trước rerank |
-| `app/bm25.py` | Lexical search | BM25 from scratch (khớp chính xác điều khoản) |
-| `app/vectorstore.py` | Semantic search | cosine + lọc `active_spec`/version (không trộn) |
-| `app/fusion.py` | Hợp nhất | **RRF** (theo rank, không cộng score) |
-| `app/rerank.py` | Tinh chỉnh | retrieve-nhiều → rerank-ít (cross-encoder ở prod) |
-| `app/rag.py` | Sinh câu trả lời | **citation bắt buộc + refuse + out-of-scope hint + untrusted separation** |
-| `app/guardrail.py` | Phòng thủ LLM | injection/exfil detect, sanitize-as-data |
-| `app/audit.py` | Kiểm toán | append-only hash-chain (tamper-evident) |
-| `app/warehouse.py` | Analytics | sqlite (→DuckDB) query analytics cho SLO/compliance |
-| `app/api.py` + `mcp.py` | Giao diện | FastAPI REST + MCP-style tool |
+| `app/ingest.py` | Resumable pipeline (PARSE → CHUNK → EMBED) | Checkpointed state machine, idempotent, with fault-injection tests |
+| `app/reindex.py` + `service.py` | Zero-downtime reindex | **Blue/green by spec with an atomic switch** |
+| `app/acl.py` + `retriever.py` | Access control | **ACL PRE-filter (department × clearance)** applied before reranking |
+| `app/bm25.py` | Lexical search | BM25 from scratch (exact clause matching) |
+| `app/vectorstore.py` | Semantic search | Cosine similarity, filtered by `active_spec`/version so generations never mix |
+| `app/fusion.py` | Result merging | **Reciprocal rank fusion** (by rank, not by summing scores) |
+| `app/rerank.py` | Refinement | Retrieve wide, rerank narrow (cross-encoder in production) |
+| `app/rag.py` | Answer generation | **Mandatory citations + refusal + out-of-scope hints + untrusted-data separation** |
+| `app/guardrail.py` | LLM defence | Injection/exfiltration detection, sanitise-as-data |
+| `app/audit.py` | Auditing | Append-only hash chain (tamper-evident) |
+| `app/warehouse.py` | Analytics | SQLite (→ DuckDB) query analytics for SLO and compliance reporting |
+| `app/api.py` + `mcp.py` | Interfaces | FastAPI REST + MCP-style tool |
 
-## Test bảo mật P0
+## P0 security tests
 
-`tests/test_acl_isolation.py` — quét mọi identity × truy vấn dò, khẳng định **không
-citation nào ngoài quyền** (chống cross-department/clearance leak). `tests/test_reindex.py`
-— zero-downtime (không cửa sổ rỗng, không trộn version).
+`tests/test_acl_isolation.py` sweeps every identity against probing queries and
+asserts that **no citation ever falls outside the caller's permissions**, guarding
+against cross-department and cross-clearance leaks. `tests/test_reindex.py`
+verifies zero-downtime behaviour: no empty-result window, and no mixing of index
+versions.

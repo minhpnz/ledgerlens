@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Kiểu dữ liệu lõi của LedgerLens.
 
 Mô hình bảo mật (đọc kỹ — đây là xương sống threat model):

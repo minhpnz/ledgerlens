@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """LedgerLensService — orchestrator framework-agnostic (api.py chỉ là lớp mỏng).
 
 Nối: ingest (resumable) -> retriever (hybrid + ACL pre-filter + rerank) -> rag

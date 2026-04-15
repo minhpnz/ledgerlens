@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Ingest pipeline RESUMABLE — parse -> chunk -> embed, có checkpoint theo stage.
 
 Bài toán: ingest tài liệu lớn (parse/OCR/chunk/embed) tốn thời gian; nếu worker

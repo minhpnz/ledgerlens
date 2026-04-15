@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Audit trail append-only, HASH-CHAINED (tamper-evident) — cho kiểm toán.
 
 Giống SentinelLog: mỗi bản ghi chứa hash bản ghi trước → sửa/xoá giữa chuỗi làm

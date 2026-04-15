@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Seed corpus + identity demo: 2 phòng ban × nhiều mức mật để minh hoạ ACL.
 
 Dùng trong main.py (chạy server) và trong test (dựng service có sẵn dữ liệu).

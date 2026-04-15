@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """MCP-style tool endpoints — để Claude/agent kết nối LedgerLens như một tool.
 
 MCP (Model Context Protocol) là chuẩn mở cho LLM/agent gọi tool & data source qua

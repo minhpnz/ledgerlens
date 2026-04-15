@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """INVARIANT TEST: zero-downtime reindex — không cửa sổ rỗng, không trộn version."""
 from app.embedding import HashEmbedder
 from app.seed import build_seeded_service

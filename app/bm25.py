@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """BM25 — lexical/keyword search, hiện thực from scratch (không thư viện).
 
 Vì sao cần BM25 bên cạnh vector (câu hỏi phỏng vấn kinh điển):

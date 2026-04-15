@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 from app.audit import AuditLog
 from app.guardrail import detect_injection, looks_like_exfiltration, sanitize_snippet
 

@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Embedding local, DETERMINISTIC (feature hashing) — chạy/test offline, không API.
 
 Giống HashEmbedder bên SentinelLog (Go): tách token → hash vào chiều cố định →

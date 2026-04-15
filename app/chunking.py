@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Section-aware chunking cho tài liệu policy/pháp lý.
 
 Vì sao section-aware (không fixed-size cắt mù): tài liệu compliance có cấu trúc

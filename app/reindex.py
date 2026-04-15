@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Zero-downtime reindex — đổi embedding model KHÔNG có cửa sổ search rỗng.
 
 Bài toán (bài học từ arkon): đổi embedding model nghĩa là phải tính lại TOÀN BỘ

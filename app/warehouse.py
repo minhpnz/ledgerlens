@@ -1,3 +1,4 @@
+#Developed by HenryPhan
 """Query analytics warehouse — dùng sqlite3 (stdlib) làm cột-analytics nhẹ.
 
 Vì sao sqlite3 ở đây (và cái gì thật sự dùng ở prod): plan gốc dùng DuckDB/BigQuery.

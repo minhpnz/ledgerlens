@@ -1,9 +1,12 @@
-"""Reciprocal Rank Fusion (RRF) — hợp nhất kết quả BM25 + vector.
+#Developed by HenryPhan
+"""Reciprocal Rank Fusion (RRF) — merging BM25 and vector results.
 
-Vì sao RRF (không cộng score trực tiếp): score của BM25 và cosine ở THANG KHÁC
-NHAU, không so sánh trực tiếp được. RRF chỉ dùng THỨ HẠNG:
-    rrf(d) = Σ_lists 1 / (k + rank_list(d))        (k thường = 60)
-→ đơn giản, ổn định, không cần chuẩn hoá score, rất mạnh trong thực tế.
+Why RRF rather than summing scores directly: BM25 scores and cosine similarities
+live on DIFFERENT SCALES and cannot be compared head to head. RRF uses only the
+RANKS:
+    rrf(d) = Σ_lists 1 / (k + rank_list(d))        (k is typically 60)
+This is simple, stable, needs no score normalisation, and performs remarkably
+well in practice.
 """
 from __future__ import annotations
 
@@ -13,13 +16,13 @@ from typing import Dict, List, Sequence, Tuple
 
 def rrf_fuse(ranked_lists: Sequence[Sequence[str]], k: int = 60,
              limit: int = 50) -> List[Tuple[str, float]]:
-    """ranked_lists: mỗi phần tử là list key ĐÃ SẮP theo hạng (tốt→xấu).
+    """ranked_lists: each element is a list of keys ALREADY SORTED best to worst.
 
-    Trả [(key, rrf_score)] giảm dần.
+    Returns [(key, rrf_score)] in descending order.
     """
     scores: Dict[str, float] = defaultdict(float)
     for lst in ranked_lists:
         for rank, key in enumerate(lst):
-            scores[key] += 1.0 / (k + rank + 1)  # rank 0-based → +1
+            scores[key] += 1.0 / (k + rank + 1)  # rank is 0-based, hence +1
     fused = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)
     return fused[:limit]

@@ -1,16 +1,20 @@
-"""ACL — kiểm soát truy cập theo (department × clearance).
+#Developed by HenryPhan
+"""ACL — access control by (department × clearance).
 
-QUY TẮC PRE-FILTER (điểm bảo mật số 1 của LedgerLens):
-Lọc tài liệu người dùng ĐƯỢC PHÉP thấy **TRƯỚC** khi ranking/rerank/generation —
-KHÔNG post-filter. Vì sao (câu hỏi phỏng vấn):
-  - Post-filter (search toàn bộ rồi bỏ tài liệu ngoài quyền ở cuối) rò rỉ qua
-    ranking, timing, và SỐ LƯỢNG kết quả; một bug ở bước lọc cuối = leak.
-  - Pre-filter biến 'không thấy ngoài quyền' thành BẤT BIẾN CẤU TRÚC, có test.
+THE PRE-FILTER RULE, which is LedgerLens's primary security property:
+restrict documents to the ones the caller MAY see **BEFORE** ranking, reranking
+or generation — never post-filter. Why:
+  - Post-filtering (search everything, then drop unauthorised documents at the
+    end) leaks through ranking, timing and the RESULT COUNT; a single bug in that
+    final filter is a breach.
+  - Pre-filtering makes "nothing outside your permissions is ever seen" a
+    STRUCTURAL INVARIANT that can be tested.
 
-Ngoài ra ta phân biệt hai trạng thái "không trả kết quả":
-  - Thật sự không có tài liệu liên quan → refuse bình thường.
-  - CÓ tài liệu liên quan nhưng NGOÀI QUYỀN → 'out-of-scope hint' (báo có, KHÔNG
-    lộ nội dung) — học từ arkon; giúp UX mà vẫn không rò rỉ.
+We also distinguish two different kinds of empty result:
+  - No relevant document exists → an ordinary refusal.
+  - A relevant document exists but is OUT OF SCOPE for this caller → an
+    "out-of-scope hint": we acknowledge something exists without revealing any
+    content. Better UX, still no leak.
 """
 from __future__ import annotations
 
@@ -18,9 +22,9 @@ from .models import Identity, Sensitivity
 
 
 def can_access(identity: Identity, dept: str, sensitivity: Sensitivity) -> bool:
-    """True nếu identity được phép thấy tài liệu (dept, sensitivity).
+    """True if the identity may see a document with this (dept, sensitivity).
 
-    Điều kiện: đủ clearance VÀ (cùng phòng ban HOẶC tài liệu public).
+    Requires sufficient clearance AND (same department OR a public document).
     """
     if identity.clearance < sensitivity:
         return False
