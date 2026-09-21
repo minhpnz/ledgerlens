@@ -7,9 +7,6 @@ clearance), **zero-downtime reindexing**, **resumable ingest**, a hash-chained
 audit log, warehouse analytics, and an **MCP-style tool interface** for agents to
 connect through.
 
-The engineering focus is systems, retrieval and operations rather than ML depth.
-Design notes and the "why this, not that" reasoning behind each decision are in
-`LESSONS.md`.
 
 The core (`app/`) is **framework-agnostic and tested with pytest**; `app/api.py`
 is a thin FastAPI layer on top.
@@ -45,7 +42,7 @@ curl -s localhost:8090/v1/analytics    -H 'Authorization: Bearer fin-admin'
 curl -s localhost:8090/v1/audit/verify -H 'Authorization: Bearer fin-admin'
 ```
 
-## Module map (details and alternatives in `LESSONS.md`)
+## Module map
 
 | File | Role | Pattern |
 |---|---|---|
